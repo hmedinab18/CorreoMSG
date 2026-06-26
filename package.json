@@ -1,0 +1,23 @@
+{
+  "name": "generador-msg-entel",
+  "version": "1.0.0",
+  "description": "Generador de correos .MSG para Entel Perú — Crea archivos de correo ya enviados en el navegador",
+  "scripts": {
+    "dev": "python3 -m http.server 3000",
+    "start": "python3 -m http.server 3000"
+  },
+  "keywords": [
+    "msg",
+    "outlook",
+    "mapi",
+    "entel",
+    "peru",
+    "email",
+    "generator"
+  ],
+  "author": "Hector",
+  "license": "MIT",
+  "engines": {
+    "node": "18.x"
+  }
+}

@@ -1,0 +1,976 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Generador de Correos .MSG — Entel Perú</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap');
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg:        #0f1117;
+    --surface:   #181c27;
+    --border:    #252a38;
+    --border-hi: #3a4257;
+    --accent:    #d61f46;
+    --accent-dim:#4a1230;
+    --green:     #22c55e;
+    --red:       #ef4444;
+    --text:      #e2e8f0;
+    --muted:     #64748b;
+    --label:     #94a3b8;
+    --mono:      'JetBrains Mono', monospace;
+    --sans:      'Inter', system-ui, sans-serif;
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--sans);
+    font-size: 14px;
+    line-height: 1.6;
+    min-height: 100vh;
+    padding: 40px 20px 60px;
+  }
+
+  .shell {
+    max-width: 900px;
+    margin: 0 auto;
+  }
+
+  header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 36px;
+    padding-bottom: 24px;
+    border-bottom: 1px solid var(--border);
+  }
+  
+  .logo-wrap {
+    width: 56px;
+    height: 56px;
+    background: linear-gradient(135deg, #d61f46 0%, #8b1538 100%);
+    border-radius: 12px;
+    display: grid;
+    place-items: center;
+    flex-shrink: 0;
+  }
+  
+  .logo-wrap svg { width: 32px; height: 32px; }
+  
+  .header-text h1 {
+    font-size: 22px;
+    font-weight: 700;
+    color: #fff;
+    letter-spacing: -0.3px;
+  }
+  
+  .header-text p {
+    font-size: 13px;
+    color: var(--muted);
+    margin-top: 4px;
+  }
+  
+  .badge-entel {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+    font-weight: 700;
+    color: #d61f46;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-top: 8px;
+  }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 24px;
+    margin-bottom: 16px;
+  }
+  
+  .card-title {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: #d61f46;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .grid3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+  .full  { grid-column: 1 / -1; }
+
+  .field { display: flex; flex-direction: column; gap: 5px; }
+  .field label {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--label);
+  }
+  .req { color: #d61f46; }
+
+  input, textarea, select {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text);
+    font-family: var(--sans);
+    font-size: 13.5px;
+    padding: 10px 12px;
+    outline: none;
+    transition: all 0.15s;
+    width: 100%;
+  }
+  
+  input:focus, textarea:focus, select:focus {
+    border-color: #d61f46;
+    box-shadow: 0 0 0 3px rgba(214, 31, 70, 0.1);
+  }
+  
+  input.error, textarea.error, select.error {
+    border-color: var(--red);
+  }
+  
+  input::placeholder, textarea::placeholder { color: var(--muted); }
+  
+  select {
+    cursor: pointer;
+  }
+  
+  select option {
+    background: var(--surface);
+    color: var(--text);
+  }
+
+  textarea {
+    resize: vertical;
+    min-height: 100px;
+    font-family: var(--mono);
+    font-size: 13px;
+    line-height: 1.6;
+  }
+
+  .actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 8px;
+    flex-wrap: wrap;
+  }
+  
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 11px 22px;
+    border-radius: 8px;
+    font-size: 13.5px;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    transition: all 0.15s;
+  }
+  
+  .btn-primary {
+    background: linear-gradient(135deg, #d61f46 0%, #a01635 100%);
+    color: #fff;
+  }
+  
+  .btn-primary:hover {
+    background: linear-gradient(135deg, #e63054 0%, #b01c3d 100%);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(214, 31, 70, 0.3);
+  }
+  
+  .btn-ghost {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--label);
+  }
+  
+  .btn-ghost:hover {
+    border-color: var(--border-hi);
+    color: var(--text);
+    background: rgba(255,255,255,0.05);
+  }
+
+  .preview-box {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px;
+    font-family: var(--mono);
+    font-size: 12px;
+    line-height: 1.8;
+    color: var(--muted);
+    max-height: 300px;
+    overflow-y: auto;
+  }
+  
+  .preview-box .pkey { color: #d61f46; font-weight: 600; }
+  .preview-box .pval { color: var(--text); }
+  .preview-box .pbody { color: #7dd3fc; white-space: pre-wrap; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border); }
+
+  #toast {
+    position: fixed;
+    bottom: 28px;
+    right: 28px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 13px 18px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 13.5px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+    transform: translateY(120px);
+    opacity: 0;
+    transition: all 0.3s cubic-bezier(0.34,1.56,0.64,1);
+    z-index: 100;
+    max-width: 380px;
+  }
+  
+  #toast.show {
+    transform: translateY(0);
+    opacity: 1;
+  }
+  
+  #toast.success { border-color: var(--green); }
+  #toast.error { border-color: var(--red); }
+  #toast.success .t-icon { color: var(--green); }
+  #toast.error .t-icon { color: var(--red); }
+  
+  .t-icon { display: flex; align-items: center; }
+  .t-icon svg { width: 18px; height: 18px; }
+
+  .info-box {
+    background: rgba(214, 31, 70, 0.08);
+    border: 1px solid rgba(214, 31, 70, 0.2);
+    border-radius: 8px;
+    padding: 12px 14px;
+    font-size: 12px;
+    color: #f0aab4;
+    margin-top: 4px;
+    display: flex;
+    gap: 10px;
+  }
+
+  .divider {
+    height: 1px;
+    background: var(--border);
+    margin: 20px 0;
+  }
+
+  @media (max-width: 768px) {
+    .grid2, .grid3 { grid-template-columns: 1fr; }
+    .full { grid-column: 1; }
+    header { flex-direction: column; align-items: flex-start; }
+  }
+
+  .loading {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.5);
+    display: grid;
+    place-items: center;
+    z-index: 200;
+  }
+
+  .loading.show { display: grid; }
+
+  .spinner {
+    width: 40px;
+    height: 40px;
+    border: 3px solid rgba(214, 31, 70, 0.2);
+    border-top-color: #d61f46;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+</style>
+</head>
+<body>
+
+<div class="shell">
+
+  <!-- Header -->
+  <header>
+    <div class="logo-wrap">
+      <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
+        <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+        <path d="M22 6L12 13 2 6"/>
+      </svg>
+    </div>
+    <div class="header-text">
+      <h1>Generador de Correos .MSG</h1>
+      <p>Crea correos Entel Perú ya enviados — en el navegador, sin instalación</p>
+      <div class="badge-entel">🇵🇪 Entel Perú • GPON Fiber</div>
+    </div>
+  </header>
+
+  <!-- Formulario -->
+  <div class="card">
+    <div class="card-title">📋 Información del Cliente</div>
+    <div class="grid2">
+      <div class="field">
+        <label>RUC <span class="req">*</span></label>
+        <input id="txtRUC" type="text" placeholder="20123456789" maxlength="11">
+      </div>
+      <div class="field">
+        <label>Razón Social <span class="req">*</span></label>
+        <input id="txtRS" type="text" placeholder="Empresa S.A.">
+      </div>
+    </div>
+    <div class="grid2">
+      <div class="field">
+        <label>Número de Oportunidad <span class="req">*</span></label>
+        <input id="txtOPP" type="text" placeholder="2026-06-001">
+      </div>
+      <div class="field">
+        <label>Dirección de Instalación <span class="req">*</span></label>
+        <input id="txtDIR" type="text" placeholder="Av. Primavera 1234, Lima">
+      </div>
+    </div>
+  </div>
+
+  <!-- Planes y Promociones -->
+  <div class="card">
+    <div class="card-title">📦 Detalles del Servicio</div>
+    <div class="grid3">
+      <div class="field">
+        <label>Plan Contratado <span class="req">*</span></label>
+        <select id="cmbPlan">
+          <option value="">-- Seleccionar --</option>
+          <optgroup label="Internet Empresas">
+            <option value="Internet Empresas 300">Internet Empresas 300</option>
+            <option value="Internet Empresas 500">Internet Empresas 500</option>
+            <option value="Internet Empresas 1000">Internet Empresas 1000</option>
+          </optgroup>
+          <optgroup label="Pack Empresas">
+            <option value="Pack Empresas 200">Pack Empresas 200</option>
+            <option value="Pack Empresas 300">Pack Empresas 300</option>
+            <option value="Pack Empresas 500">Pack Empresas 500</option>
+            <option value="Pack Empresas 1000">Pack Empresas 1000</option>
+          </optgroup>
+          <optgroup label="Internet Fibra +">
+            <option value="INTERNET FIBRA + 100 MBPS (36 Meses)">INTERNET FIBRA + 100 MBPS (36 Meses)</option>
+            <option value="INTERNET FIBRA + 100 MBPS (24 Meses)">INTERNET FIBRA + 100 MBPS (24 Meses)</option>
+            <option value="INTERNET FIBRA + 100 MBPS (12 Meses)">INTERNET FIBRA + 100 MBPS (12 Meses)</option>
+            <option value="INTERNET FIBRA + 200 MBPS (36 Meses)">INTERNET FIBRA + 200 MBPS (36 Meses)</option>
+            <option value="INTERNET FIBRA + 200 MBPS (24 Meses)">INTERNET FIBRA + 200 MBPS (24 Meses)</option>
+            <option value="INTERNET FIBRA + 200 MBPS (12 Meses)">INTERNET FIBRA + 200 MBPS (12 Meses)</option>
+            <option value="INTERNET FIBRA + 500 MBPS (36 Meses)">INTERNET FIBRA + 500 MBPS (36 Meses)</option>
+            <option value="INTERNET FIBRA + 500 MBPS (24 Meses)">INTERNET FIBRA + 500 MBPS (24 Meses)</option>
+            <option value="INTERNET FIBRA + 500 MBPS (12 Meses)">INTERNET FIBRA + 500 MBPS (12 Meses)</option>
+            <option value="INTERNET FIBRA + 1000 MBPS (36 Meses)">INTERNET FIBRA + 1000 MBPS (36 Meses)</option>
+            <option value="INTERNET FIBRA + 1000 MBPS (24 Meses)">INTERNET FIBRA + 1000 MBPS (24 Meses)</option>
+            <option value="INTERNET FIBRA + 1000 MBPS (12 Meses)">INTERNET FIBRA + 1000 MBPS (12 Meses)</option>
+          </optgroup>
+          <optgroup label="Pack Fibra +">
+            <option value="PACK FIBRA + 100 MBPS (36 Meses)">PACK FIBRA + 100 MBPS (36 Meses)</option>
+            <option value="PACK FIBRA + 100 MBPS (24 Meses)">PACK FIBRA + 100 MBPS (24 Meses)</option>
+            <option value="PACK FIBRA + 100 MBPS (12 Meses)">PACK FIBRA + 100 MBPS (12 Meses)</option>
+            <option value="PACK FIBRA + 200 MBPS (36 Meses)">PACK FIBRA + 200 MBPS (36 Meses)</option>
+            <option value="PACK FIBRA + 200 MBPS (24 Meses)">PACK FIBRA + 200 MBPS (24 Meses)</option>
+            <option value="PACK FIBRA + 200 MBPS (12 Meses)">PACK FIBRA + 200 MBPS (12 Meses)</option>
+            <option value="PACK FIBRA + 500 MBPS (36 Meses)">PACK FIBRA + 500 MBPS (36 Meses)</option>
+            <option value="PACK FIBRA + 500 MBPS (24 Meses)">PACK FIBRA + 500 MBPS (24 Meses)</option>
+            <option value="PACK FIBRA + 500 MBPS (12 Meses)">PACK FIBRA + 500 MBPS (12 Meses)</option>
+            <option value="PACK FIBRA + 1000 MBPS (36 Meses)">PACK FIBRA + 1000 MBPS (36 Meses)</option>
+            <option value="PACK FIBRA + 1000 MBPS (24 Meses)">PACK FIBRA + 1000 MBPS (24 Meses)</option>
+            <option value="PACK FIBRA + 1000 MBPS (12 Meses)">PACK FIBRA + 1000 MBPS (12 Meses)</option>
+          </optgroup>
+        </select>
+      </div>
+      <div class="field">
+        <label>Promoción <span class="req">*</span></label>
+        <select id="cmbprom">
+          <option value="">-- Seleccionar --</option>
+          <option value="GPON POWER 3.0: 30% y bono de velocidad por 6m.">GPON POWER 3.0: 30% y bono de velocidad por 6m.</option>
+          <option value="30% por 4 - Fibra +">30% por 4 - Fibra +</option>
+          <option value="30% por 4 - Fibra + (Sin descripción adicional)">Sin promoción específica</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Plazo de la Promoción <span class="req">*</span></label>
+        <select id="cmbPLA">
+          <option value="">-- Seleccionar --</option>
+          <option value="4 meses">4 meses</option>
+          <option value="6 meses">6 meses</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <!-- Contactos -->
+  <div class="card">
+    <div class="card-title">👥 Partes Involucradas</div>
+    <div class="grid2">
+      <div class="field">
+        <label>Nombre del Destinatario <span class="req">*</span></label>
+        <input id="txtDES" type="text" placeholder="Juan Pérez García">
+        <div class="info-box">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0;">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="12" y1="16" x2="12" y2="12"></line>
+            <line x1="12" y1="8" x2="12.01" y2="8"></line>
+          </svg>
+          <span>Se convertirá a mayúscula inicial automáticamente</span>
+        </div>
+      </div>
+      <div class="field">
+        <label>Email del Destinatario <span class="req">*</span></label>
+        <input id="txtCORRDES" type="email" placeholder="cliente@empresa.com">
+      </div>
+    </div>
+    <div class="field full">
+      <label>Email del Remitente (Entel) <span class="req">*</span></label>
+      <input id="txtCORREM" type="email" placeholder="ventas@entel.pe">
+    </div>
+  </div>
+
+  <!-- Fecha y Hora -->
+  <div class="card">
+    <div class="card-title">📅 Fecha y Hora de Envío</div>
+    <div class="grid2">
+      <div class="field">
+        <label>Fecha <span class="req">*</span></label>
+        <input id="textFECH_date" type="date">
+      </div>
+      <div class="field">
+        <label>Hora <span class="req">*</span></label>
+        <input id="textFECH_time" type="time">
+      </div>
+    </div>
+  </div>
+
+  <!-- Adjuntos (Opcional) -->
+  <div class="card">
+    <div class="card-title">📎 Documento Adjunto (Opcional)</div>
+    <div class="field full">
+      <label>Selecciona un archivo PDF o documento</label>
+      <input id="fileAdjunto" type="file" accept=".pdf,.doc,.docx,.xls,.xlsx,.txt" style="padding:12px; cursor:pointer;">
+      <div class="info-box">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0;">
+          <circle cx="12" cy="12" r="10"></circle>
+          <line x1="12" y1="16" x2="12" y2="12"></line>
+          <line x1="12" y1="8" x2="12.01" y2="8"></line>
+        </svg>
+        <span>Tipos soportados: PDF, DOC, DOCX, XLS, XLSX, TXT (máx 10 MB)</span>
+      </div>
+    </div>
+    <div id="archivo-info" style="display:none; margin-top:12px;">
+      <div style="background:rgba(34,197,94,0.1); border:1px solid rgba(34,197,94,0.3); border-radius:8px; padding:12px; color:#22c55e; font-size:12px;">
+        📄 Archivo seleccionado: <strong id="archivo-nombre"></strong> (<span id="archivo-tamano"></span>)
+      </div>
+    </div>
+  </div>
+
+  <!-- Preview -->
+  <div class="card" id="preview-card" style="display:none">
+    <div class="card-title">👁️ Vista Previa del Correo</div>
+    <div class="preview-box" id="preview-box"></div>
+  </div>
+
+  <!-- Acciones -->
+  <div class="actions">
+    <button class="btn btn-primary" onclick="generateMSG()">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+        <polyline points="7 10 12 15 17 10"/>
+        <line x1="12" y1="15" x2="12" y2="3"/>
+      </svg>
+      Generar y Descargar .MSG
+    </button>
+    <button class="btn btn-ghost" onclick="previewMSG()">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+        <circle cx="12" cy="12" r="3"/>
+      </svg>
+      Vista Previa
+    </button>
+    <button class="btn btn-ghost" onclick="clearForm()">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <polyline points="3 6 5 6 21 6"/>
+        <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+      </svg>
+      Limpiar
+    </button>
+  </div>
+
+</div><!-- /shell -->
+
+<!-- Loading -->
+<div class="loading" id="loading">
+  <div class="spinner"></div>
+</div>
+
+<!-- Toast -->
+<div id="toast">
+  <span class="t-icon" id="toast-icon"></span>
+  <span id="toast-msg"></span>
+</div>
+
+<script>
+// ══════════════════════════════════════════════════════════════════════════════
+// OLE2 / MAPI — Generador de .MSG en JavaScript puro
+// ══════════════════════════════════════════════════════════════════════════════
+
+const PT_LONG=0x0003,PT_BOOLEAN=0x000B,PT_SYSTIME=0x0040,PT_UNICODE=0x001F;
+const PR={
+  MESSAGE_CLASS:0x001A, SUBJECT:0x0037, CLIENT_SUBMIT_TIME:0x0039,
+  SENT_REPR_NAME:0x0042, RECEIVED_BY_NAME:0x0040, SENDER_ADDRTYPE:0x0C1E,
+  SENDER_NAME:0x0C1A, SENDER_EMAIL:0x0C1F, DISPLAY_TO:0x0E04,
+  MESSAGE_FLAGS:0x0E07, HASATTACH:0x0E1B, NORMALIZED_SUBJECT:0x0E1D,
+  DELIVERY_TIME:0x0E06, BODY:0x1000, SENT_REPR_EMAIL:0x0065,
+  RECEIVED_BY_EMAIL:0x0076
+};
+const MFLAG_READ=1,MFLAG_SENT=4;
+const FREE=0xFFFFFFFF,EOC=0xFFFFFFFE,FATSEC=0xFFFFFFFD;
+
+function dt2ft(dt){
+  const EPOCH=new Date('1601-01-01T00:00:00Z');
+  const ms=dt.getTime()-EPOCH.getTime();
+  const lo=BigInt(Math.floor(ms*10000));
+  return lo;
+}
+
+function u16(s){
+  const buf=new Uint8Array((s.length+1)*2);
+  const v=new DataView(buf.buffer);
+  for(let i=0;i<s.length;i++) v.setUint16(i*2,s.charCodeAt(i),true);
+  return buf;
+}
+
+function pad4(arr){
+  const r=arr.length%4;
+  if(r===0) return arr;
+  const out=new Uint8Array(arr.length+(4-r));
+  out.set(arr);return out;
+}
+
+function pname(pid,pt){
+  return `__substg1.0_${(pid&0xFFFF).toString(16).toUpperCase().padStart(4,'0')}${(pt&0xFFFF).toString(16).toUpperCase().padStart(4,'0')}`;
+}
+
+function nsecs(n,sz=512){
+  return n<=0?0:Math.ceil(n/sz);
+}
+
+function concat(...arrs){
+  const len=arrs.reduce((a,b)=>a+b.length,0);
+  const out=new Uint8Array(len);let off=0;
+  for(const a of arrs){out.set(a,off);off+=a.length;}
+  return out;
+}
+
+function writeU32(v,buf,off){
+  buf[off]=(v)&0xFF;buf[off+1]=(v>>8)&0xFF;
+  buf[off+2]=(v>>16)&0xFF;buf[off+3]=(v>>24)&0xFF;
+}
+
+function writeU64(v,buf,off){
+  const lo=Number(v&0xFFFFFFFFn);
+  const hi=Number((v>>32n)&0xFFFFFFFFn);
+  writeU32(lo,buf,off);writeU32(hi,buf,off+4);
+}
+
+function buildPropStream(entries){
+  const header=new Uint8Array(32);
+  const parts=[header];
+  for(const[pid,pt,val]of entries){
+    const tag=((pid&0xFFFF)<<16)|(pt&0xFFFF);
+    const chunk=new Uint8Array(16);const v=new DataView(chunk.buffer);
+    v.setUint32(0,tag>>>0,true);
+    if(pt===PT_LONG){
+      v.setUint32(4,0,true);
+      v.setUint32(8,val>>>0,true);
+      v.setUint32(12,0,true);
+    }else if(pt===PT_BOOLEAN){
+      v.setUint32(4,0,true);
+      v.setUint32(8,val?1:0,true);
+      v.setUint32(12,0,true);
+    }else if(pt===PT_SYSTIME){
+      v.setUint32(4,0,true);
+      writeU64(val,chunk,8);
+    }else if(pt===PT_UNICODE){
+      v.setUint32(4,val.length,true);
+      v.setUint32(8,0,true);
+      v.setUint32(12,0,true);
+    }
+    parts.push(chunk);
+  }
+  return concat(...parts);
+}
+
+function buildOLE2(streams){
+  const S=512,M=64,MC=4096;
+  const small=streams.filter(s=>s.data.length<MC);
+  const large=streams.filter(s=>s.data.length>=MC);
+  
+  let mblob=new Uint8Array(0);
+  const minfo={};
+  for(const{name,data}of small){
+    const ms=mblob.length/M|0;minfo[name]={ms,sz:data.length};
+    const pad=(M-data.length%M)%M;
+    mblob=concat(mblob,data,new Uint8Array(pad));
+  }
+  
+  let cur=0;
+  const fat_s=cur++;
+  let mc_start=null;const mc_secs=nsecs(mblob.length);
+  if(mc_secs){mc_start=cur;cur+=mc_secs;}
+  const linfo={};
+  for(const{name,data}of large){linfo[name]={st:cur,sc:nsecs(data.length)};cur+=nsecs(data.length);}
+  let mf_s=null;
+  if(mblob.length){mf_s=cur++;}
+  const dir_s=cur;const dir_c=nsecs((1+streams.length)*128);cur+=dir_c;
+  const tot=cur;
+  
+  const fat=new Int32Array(tot).fill(-1);
+  fat[fat_s]=FATSEC|0;
+  if(mc_start!==null)for(let i=0;i<mc_secs;i++)fat[mc_start+i]=(i<mc_secs-1)?mc_start+i+1:EOC|0;
+  for(const{name,data}of large){const{st,sc}=linfo[name];for(let i=0;i<sc;i++)fat[st+i]=(i<sc-1)?st+i+1:EOC|0;}
+  if(mf_s!==null)fat[mf_s]=EOC|0;
+  for(let i=0;i<dir_c;i++)fat[dir_s+i]=(i<dir_c-1)?dir_s+i+1:EOC|0;
+  
+  const mfe=[];
+  for(const{name,data}of small){
+    const{ms,sz}=minfo[name];const mc2=nsecs(sz,M);
+    for(let i=0;i<mc2;i++)mfe.push(i<mc2-1?ms+i+1:EOC|0);
+  }
+  while(mfe.length%(S/4))mfe.push(FREE|0);
+  
+  function de({name='',typ=0,col=1,child=-1,left=-1,right=-1,start=EOC,size=0,clsid=new Uint8Array(16)}={}){
+    const buf=new Uint8Array(128);const v=new DataView(buf.buffer);
+    const enc=name?u16(name.slice(0,31)):new Uint8Array(0);
+    const nlen=enc.length?(enc.length):0;
+    buf.set(enc.slice(0,64),0);
+    v.setUint16(64,nlen,true);
+    buf[66]=typ;buf[67]=col;
+    v.setInt32(68,left,true);v.setInt32(72,right,true);v.setInt32(76,child,true);
+    v.setUint32(80,0,true);buf.set(clsid,96);
+    v.setUint32(116,start>>>0,true);
+    v.setUint32(120,size>>>0,true);
+    return buf;
+  }
+  const rclsid=new Uint8Array([0x06,0x08,0x02,0x00,0x00,0x00,0x00,0x00,0xC0,0x00,0x00,0x00,0x00,0x00,0x00,0x46]);
+  const des=[de({name:'Root Entry',typ:5,col:1,child:streams.length?1:-1,
+    start:mc_start!==null?mc_start:EOC,size:mblob.length,clsid:rclsid})];
+  streams.forEach(({name,data},i)=>{
+    const right=i+1<streams.length?i+2:-1;
+    if(minfo[name]){
+      const{ms,sz}=minfo[name];des.push(de({name,typ:2,col:1,right,start:ms,size:sz}));
+    }else{
+      const{st,sc}=linfo[name];des.push(de({name,typ:2,col:1,right,start:st,size:data.length}));
+    }
+  });
+  while(des.length%4)des.push(de({typ:0,col:1}));
+  const ddata=concat(...des);
+  
+  function psec(arr,sz=S){const r=(sz-arr.length%sz)%sz;return concat(arr,new Uint8Array(r));}
+  const sdata=Array.from({length:tot},()=>new Uint8Array(S));
+  
+  const fb=new Uint8Array(tot*4);
+  for(let i=0;i<tot;i++)writeU32(fat[i]>>>0,fb,i*4);
+  sdata[fat_s]=psec(fb).slice(0,S);
+  
+  if(mc_start!==null){
+    const cb=psec(mblob);
+    for(let i=0;i<mc_secs;i++)sdata[mc_start+i]=cb.slice(i*S,(i+1)*S);
+  }
+  for(const{name,data}of large){
+    const{st,sc}=linfo[name];const pb=psec(data);
+    for(let i=0;i<sc;i++)sdata[st+i]=pb.slice(i*S,(i+1)*S);
+  }
+  if(mf_s!==null){
+    const mfb=new Uint8Array(mfe.length*4);
+    mfe.forEach((v,i)=>writeU32(v>>>0,mfb,i*4));
+    sdata[mf_s]=psec(mfb).slice(0,S);
+  }
+  for(let i=0;i<dir_c;i++)sdata[dir_s+i]=ddata.slice(i*S,(i+1)*S);
+  
+  const hdr=new Uint8Array(512);const hv=new DataView(hdr.buffer);
+  [0xD0,0xCF,0x11,0xE0,0xA1,0xB1,0x1A,0xE1].forEach((b,i)=>hdr[i]=b);
+  hv.setUint16(24,0x003E,true);hv.setUint16(26,0x0003,true);
+  hv.setUint16(28,0xFFFE,true);
+  hv.setUint16(30,9,true);hv.setUint16(32,6,true);
+  hv.setUint32(40,0,true);
+  hv.setUint32(44,1,true);
+  hv.setUint32(48,dir_s,true);
+  hv.setUint32(52,0,true);
+  hv.setUint32(56,MC,true);
+  hv.setUint32(60,mf_s!==null?mf_s:FREE>>>0,true);
+  hv.setUint32(64,mf_s!==null?1:0,true);
+  hv.setUint32(68,EOC>>>0,true);
+  hv.setUint32(72,0,true);
+  hv.setUint32(76,fat_s,true);
+  for(let i=1;i<109;i++)hv.setUint32(76+i*4,FREE>>>0,true);
+  
+  return concat(hdr,...sdata);
+}
+
+function createMSG({subject,body,fromName,fromEmail,toName,toEmail,sentDate,attachment}){
+  const ft=dt2ft(sentDate);
+  
+  const strProps=[
+    [PR.MESSAGE_CLASS,PT_UNICODE,'IPM.Note'],
+    [PR.SUBJECT,PT_UNICODE,subject],
+    [PR.NORMALIZED_SUBJECT,PT_UNICODE,subject],
+    [PR.BODY,PT_UNICODE,body],
+    [PR.SENDER_ADDRTYPE,PT_UNICODE,'SMTP'],
+    [PR.SENDER_NAME,PT_UNICODE,fromName],
+    [PR.SENDER_EMAIL,PT_UNICODE,fromEmail],
+    [PR.SENT_REPR_NAME,PT_UNICODE,fromName],
+    [PR.SENT_REPR_EMAIL,PT_UNICODE,fromEmail],
+    [PR.DISPLAY_TO,PT_UNICODE,`${toName} <${toEmail}>`],
+    [PR.RECEIVED_BY_NAME,PT_UNICODE,toName],
+    [PR.RECEIVED_BY_EMAIL,PT_UNICODE,toEmail],
+  ];
+  const fixProps=[
+    [PR.MESSAGE_FLAGS,PT_LONG,MFLAG_READ|MFLAG_SENT],
+    [PR.HASATTACH,PT_BOOLEAN,attachment?true:false],
+    [PR.CLIENT_SUBMIT_TIME,PT_SYSTIME,ft],
+    [PR.DELIVERY_TIME,PT_SYSTIME,ft],
+  ];
+  
+  const allForProp=[...fixProps,...strProps.map(([pid,pt,val])=>[pid,pt,u16(val)])];
+  const propStream=buildPropStream(allForProp);
+  
+  const streams=[{name:'__properties_version1.0',data:propStream}];
+  for(const[pid,pt,val]of strProps){
+    streams.push({name:pname(pid,pt),data:pad4(u16(val))});
+  }
+  
+  // Agregar adjunto si existe
+  if(attachment && attachment.datos){
+    // Nombre del adjunto (encode UTF-16LE)
+    const attachmentFilename=attachment.nombre;
+    const attachmentData=attachment.datos;
+    
+    // Crear stream para el archivo adjunto
+    const attachmentStream={
+      name:'__attach_version1.0_#00000000',
+      data:attachmentData
+    };
+    streams.push(attachmentStream);
+    
+    // Propiedades del adjunto
+    const attachPropName='__attach_version1.0_#00000000/__properties_version1.0';
+    const attachProps=[
+      [0x3701,PT_UNICODE,attachmentFilename],  // PR_ATTACH_FILENAME
+      [0x3702,PT_LONG,attachmentData.length],  // PR_ATTACH_SIZE
+      [0x3704,PT_LONG,1],  // PR_ATTACH_NUM
+      [0x370E,PT_LONG,6],  // PR_ATTACH_METHOD (ATTACH_BY_VALUE)
+    ];
+    const attachPropStream=buildPropStream(attachProps);
+    streams.push({
+      name:attachmentStream.name+'/__properties_version1.0',
+      data:attachPropStream
+    });
+  }
+  
+  return buildOLE2(streams);
+}
+
+function downloadMSG(data,filename){
+  const blob=new Blob([data],{type:'application/octet-stream'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download=filename.endsWith('.msg')?filename:filename+'.msg';
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// UI LOGIC
+// ══════════════════════════════════════════════════════════════════════════════
+
+let adjuntoData = null;
+let adjuntoNombre = null;
+
+// Manejar cambio de archivo adjunto
+document.getElementById('fileAdjunto').addEventListener('change', function(e) {
+  const file = e.target.files[0];
+  if (!file) {
+    adjuntoData = null;
+    adjuntoNombre = null;
+    document.getElementById('archivo-info').style.display = 'none';
+    return;
+  }
+  
+  if (file.size > 10 * 1024 * 1024) {
+    showToast('❌ El archivo es muy grande (máx 10 MB)', 'error');
+    e.target.value = '';
+    return;
+  }
+  
+  const reader = new FileReader();
+  reader.onload = (evt) => {
+    adjuntoData = new Uint8Array(evt.target.result);
+    adjuntoNombre = file.name;
+    document.getElementById('archivo-nombre').textContent = file.name;
+    document.getElementById('archivo-tamano').textContent = (file.size / 1024).toFixed(2) + ' KB';
+    document.getElementById('archivo-info').style.display = 'block';
+  };
+  reader.readAsArrayBuffer(file);
+});
+
+function showToast(msg,type='success'){
+  const t=document.getElementById('toast');
+  document.getElementById('toast-msg').textContent=msg;
+  const icon=type==='success'
+    ?'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>'
+    :'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>';
+  document.getElementById('toast-icon').innerHTML=icon;
+  t.className='show '+type;
+  clearTimeout(t._to);
+  t._to=setTimeout(()=>t.className='',3200);
+}
+
+function getFormData(){
+  return {
+    ruc: document.getElementById('txtRUC').value.trim(),
+    rs: document.getElementById('txtRS').value.trim(),
+    opp: document.getElementById('txtOPP').value.trim(),
+    dir: document.getElementById('txtDIR').value.trim(),
+    plan: document.getElementById('cmbPlan').value.trim(),
+    prom: document.getElementById('cmbprom').value.trim(),
+    pla: document.getElementById('cmbPLA').value.trim(),
+    des: document.getElementById('txtDES').value.trim(),
+    corrdes: document.getElementById('txtCORRDES').value.trim(),
+    correm: document.getElementById('txtCORREM').value.trim(),
+    fech_date: document.getElementById('textFECH_date').value.trim(),
+    fech_time: document.getElementById('textFECH_time').value.trim(),
+  };
+}
+
+function capitalizeWords(str){
+  return str.split(' ').map(w=>w.charAt(0).toUpperCase()+w.slice(1).toLowerCase()).join(' ');
+}
+
+function validateForm(d){
+  const required=['ruc','rs','opp','dir','plan','prom','pla','des','corrdes','correm','fech_date','fech_time'];
+  let ok=true;
+  
+  for(const field of required){
+    const id=({ruc:'txtRUC',rs:'txtRS',opp:'txtOPP',dir:'txtDIR',plan:'cmbPlan',prom:'cmbprom',pla:'cmbPLA',des:'txtDES',corrdes:'txtCORRDES',correm:'txtCORREM',fech_date:'textFECH_date',fech_time:'textFECH_time'})[field];
+    const el=document.getElementById(id);
+    el.classList.toggle('error',!d[field]);
+    if(!d[field])ok=false;
+  }
+  
+  if(!ok){
+    showToast('⚠️ Completa todos los campos obligatorios','error');
+    return null;
+  }
+  
+  return d;
+}
+
+function previewMSG(){
+  const d=getFormData();
+  if(!validateForm(d))return;
+  
+  const subject=`CONTRATO INTERNET FIJO ENTEL // ${d.rs} // ${d.ruc} // ${d.opp}`;
+  const body=`Estimado(a) ${capitalizeWords(d.des)}, buen día.\n\nAdjunto enviamos el resumen de la venta del servicio de internet que ha contratado con nosotros.\n\nNúmero de oportunidad: ${d.opp}\nDirección de instalación: ${d.dir}\nPlan contratado: ${d.plan}\nNombre de promoción: ${d.prom}\nPlazo de la promoción: ${d.pla}`;
+  
+  const card=document.getElementById('preview-card');
+  const box=document.getElementById('preview-box');
+  
+  const dt=new Date(`${d.fech_date}T${d.fech_time}`);
+  
+  box.innerHTML=`
+    <div><span class="pkey">De:</span> <span class="pval">Ventas Entel &lt;${d.correm}&gt;</span></div>
+    <div><span class="pkey">Para:</span> <span class="pval">${capitalizeWords(d.des)} &lt;${d.corrdes}&gt;</span></div>
+    <div><span class="pkey">Asunto:</span> <span class="pval">${subject}</span></div>
+    <div><span class="pkey">Fecha:</span> <span class="pval">${dt.toLocaleString('es-PE')}</span></div>
+    <div><span class="pkey">Estado:</span> <span class="pval" style="color:var(--green)">✓ Enviado</span></div>
+    <div class="pbody">${body}</div>
+  `;
+  
+  card.style.display='block';
+  card.scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+
+function generateMSG(){
+  const d=getFormData();
+  if(!validateForm(d))return;
+  
+  document.getElementById('loading').classList.add('show');
+  
+  setTimeout(()=>{
+    try{
+      const subject=`CONTRATO INTERNET FIJO ENTEL // ${d.rs} // ${d.ruc} // ${d.opp}`;
+      const body=`Estimado(a) ${capitalizeWords(d.des)}, buen día.\n\nAdjunto enviamos el resumen de la venta del servicio de internet que ha contratado con nosotros.\n\nNúmero de oportunidad: ${d.opp}\nDirección de instalación: ${d.dir}\nPlan contratado: ${d.plan}\nNombre de promoción: ${d.prom}\nPlazo de la promoción: ${d.pla}`;
+      
+      const dt=new Date(`${d.fech_date}T${d.fech_time}`);
+      
+      // Incluir adjunto si existe
+      let attachment = null;
+      if (adjuntoData && adjuntoNombre) {
+        attachment = {
+          nombre: adjuntoNombre,
+          datos: adjuntoData
+        };
+      }
+      
+      const msgData=createMSG({
+        subject,
+        body,
+        fromName:'Ventas Entel',
+        fromEmail:d.correm,
+        toName:capitalizeWords(d.des),
+        toEmail:d.corrdes,
+        sentDate:dt,
+        attachment: attachment
+      });
+      
+      const fname=subject.replace(/[\\/:*?"<>|]/g,'_').slice(0,50)+'.msg';
+      downloadMSG(msgData,fname);
+      
+      const msgAdjunto = adjuntoData ? ` + ${adjuntoNombre}` : '';
+      showToast(`✅ Correo .MSG descargado correctamente${msgAdjunto}`);
+    }catch(e){
+      showToast('❌ Error: '+e.message,'error');
+    }finally{
+      document.getElementById('loading').classList.remove('show');
+    }
+  },500);
+}
+
+function clearForm(){
+  ['txtRUC','txtRS','txtOPP','txtDIR','cmbPlan','cmbprom','cmbPLA','txtDES','txtCORRDES','txtCORREM','textFECH_date','textFECH_time']
+    .forEach(id=>{document.getElementById(id).value='';document.getElementById(id).classList.remove('error');});
+  
+  // Limpiar adjunto
+  document.getElementById('fileAdjunto').value='';
+  adjuntoData=null;
+  adjuntoNombre=null;
+  document.getElementById('archivo-info').style.display='none';
+  
+  document.getElementById('preview-card').style.display='none';
+}
+
+// Init defaults
+(function(){
+  const now=new Date();
+  document.getElementById('textFECH_date').value=now.toISOString().split('T')[0];
+  document.getElementById('textFECH_time').value=now.toTimeString().slice(0,5);
+})();
+</script>
+</body>
+</html>
